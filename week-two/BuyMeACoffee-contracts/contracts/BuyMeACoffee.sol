@@ -27,8 +27,6 @@ contract BuyMeACoffee {
     // we can withdraw to this address later.
     address payable owner;
 
-    address payable withdrawAddress;
-
     // List of all memos received from coffee purchases.
     Memo[] memos;
 
@@ -36,23 +34,6 @@ contract BuyMeACoffee {
         // Store the address of the deployer as a payable address.
         // When we withdraw funds, we'll withdraw here.
         owner = payable(msg.sender);
-        // default withdraw address = owner
-        withdrawAddress = owner;
-    }
-
-      /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() {
-        _checkOwner();
-        _;
-    }
-
-     /**
-     * @dev Throws if the sender is not the owner.
-     */
-    function _checkOwner() internal view virtual {
-        require(owner == msg.sender, "Ownable: caller is not the owner");
     }
 
     /**
@@ -61,10 +42,6 @@ contract BuyMeACoffee {
     function getMemos() public view returns (Memo[] memory) {
         return memos;
     }
-
-    function setWithdrawAddress(address payable _newWithdrawAddress) external onlyOwner {
-        withdrawAddress = _newWithdrawAddress;
-    } 
 
     /**
      * @dev buy a coffee for owner (sends an ETH tip and leaves a memo)
@@ -96,6 +73,6 @@ contract BuyMeACoffee {
      * @dev send the entire balance stored in this contract to the owner
      */
     function withdrawTips() public {
-        require(withdrawAddress.send(address(this).balance));
+        require(owner.send(address(this).balance));
     }
 }
